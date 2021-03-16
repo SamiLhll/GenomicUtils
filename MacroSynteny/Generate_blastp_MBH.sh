@@ -28,7 +28,7 @@ do
 	?) echo "generate blast MBH - usage :";
            echo "-a path to the first specie proteins dataset (FASTA).";
            echo "-b path to the second specie proteins dataset (FASTA).";
-	   echo "-n name to give to the resulting table"
+	   echo "-o name to give to the resulting table"
            echo "-t number of threads to dedicate to the blast jobs";
            echo "-h prints this message and exit";
 	   exit;;
