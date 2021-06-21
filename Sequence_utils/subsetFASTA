@@ -6,8 +6,7 @@
 #                      2021/04/12                           #
 #############################################################
 
-# This script takes a list of proteins names and retrieves the corresponding Orthogroups
-# from Orthofinder's output
+# This script takes a list of sequence IDs + a Fasta file and creates a subset.
 
 ################ PARSE PARAMETERS :
 unset FASTA_TO_SUBSET
