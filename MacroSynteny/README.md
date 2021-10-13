@@ -8,3 +8,7 @@ generate blastp MBH (proteins only!) - usage :
 -n name to give to the resulting table   
 -t number of threads to dedicate to the blast jobs   
 -h prints this message and exit   
+
+The output is a tab delimited file formatted as follow :
+proteinID_specie_a  proteinID_specie_b
+...
