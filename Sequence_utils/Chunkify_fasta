@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+
+#############################################################
+#                    Chunkify fasta                         #
+#                    Sami El Hilali                         #
+#                      2021/10/13                           #
+#############################################################
+
+# This scrips takes a mutlifasta file to divide and a
+# max chunk size (amount of sequences). Usefull for querying
+# databases on servers where number of queries is limited
+
+####### PARSE parameters
+while getopts i:c:h option
+do
+	case "${option}"
+	in
+	i) INPUT_FASTA=${OPTARG};;
+	c) CHUNK_SIZE=${OPTARG};;
+	h) echo "---------------------------------------------"
+	   echo "chunkify fasta - usage :";
+	   echo "-i path to the input file (FASTA)";
+	   echo "-c maximum chunk size (amount of sequences)";
+	   echo "-h prints this message and exit";
+	   echo "---------------------------------------------"
+	   exit;;
+	?) echo "---------------------------------------------"
+	   echo "chunkify fasta - usage :";
+           echo "-i path to the input file (FASTA)";
+           echo "-c maximum chunk size (amount of sequences)";
+           echo "-h prints this message and exit";
+           echo "---------------------------------------------"
+	   exit;;
+	esac
+done
+
+#########################
+# exit if a command fails
+set -e
+########
+
+############### RUN :
+
+# calculate amount of proteins in input file :
+AMOUNT_OF_SEQUENCES=($(fgrep -c ">" $INPUT_FASTA))
+echo "---------------------------------------------"
+echo "amount of sequences in input file : $AMOUNT_OF_SEQUENCES"
+echo "to chunkify into pieces of maximum $CHUNK_SIZE sequences"
+
+# start to chunkify :
+CHUNKIFIED_SEQUENCES=1
+CHUNKS=1
+while [ $CHUNKIFIED_SEQUENCES -le $AMOUNT_OF_SEQUENCES ];
+do
+	if [[ $CHUNKIFIED_SEQUENCES -eq 0 ]]
+	then
+		fgrep ">" $INPUT_FASTA | head -n $CHUNK_SIZE | sed -e 's/>//g' > temp.seq_ids
+	else
+
+		fgrep ">" $INPUT_FASTA | tail -n +$CHUNKIFIED_SEQUENCES | head -n $CHUNK_SIZE | sed -e 's/>//g' > temp.seq_ids
+
+	fi
+	seqtk subseq $INPUT_FASTA temp.seq_ids > $INPUT_FASTA.chunk_$CHUNKS
+	CHUNKIFIED_SEQUENCES=$((CHUNKIFIED_SEQUENCES + $CHUNK_SIZE))
+	CHUNKS=$((CHUNKS+1))
+done
+
+# remove temp files :
+rm temp.seq_ids
+
+
+echo "DONE : created $(($CHUNKS -1)) chunks"
+echo "---------------------------------------------"
+##### DONE
