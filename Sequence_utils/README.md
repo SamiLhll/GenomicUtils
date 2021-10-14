@@ -7,8 +7,10 @@ It is supposed to adress the limitation of amount of queries when querying a dat
 It uses seqtk subseq function.
 
 ---------------------------------------------
+
 chunkify fasta - usage :
 -i path to the input file (FASTA)
 -c maximum chunk size (amount of sequences)
 -h prints this message and exit
+
 ---------------------------------------------
