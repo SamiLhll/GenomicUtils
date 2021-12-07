@@ -1,8 +1,20 @@
 # Sequence_utils :
 
+### Calculate N50 :
+
+Script that uses seqtk comp function to calculate the N50 of an assembly or binned metagenome (fasta)
+
+---------------------------------------------
+
+calculate N50 - usage :
+-i path to the genome assembly (FASTA)
+-h prints this message and exit
+
+---------------------------------------------
+
 ### Chunkify fasta :
 
-Small script to divide multifasta file into chunks of a specified maximum amount of sequences.
+Script intended at dividing multifasta file into chunks of a specified max amount of sequences.
 It is supposed to adress the limitation of amount of queries when querying a database through a webserver.
 It uses seqtk subseq function.
 
