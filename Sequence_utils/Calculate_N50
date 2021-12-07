@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+#############################################################
+#                    Calculate N50                          #
+#                    Sami El Hilali                         #
+#                      2021/12/07                           #
+#############################################################
+
+# This scrips takes a multi fasta file and computes its N50
+# using seqtk comp function
+
+####### PARSE parameters
+while getopts i:h option
+do
+	case "${option}"
+	in
+	i) FASTA_FILE=${OPTARG};;
+	h) echo "calculate N50 - usage :";
+	   echo "-i path to the genome assembly (FASTA)";
+	   echo "-h prints this message and exit";
+	   exit;;
+	?) echo "calculate N50 - usage :";
+           echo "-i path to the genome assembly (FASTA)";
+           echo "-h prints this message and exit";
+	   exit;;
+	esac
+done
+
+#########################
+# exit if a command fails 
+set -e
+########
+
+############### RUN :
+
+half_length=($(seqtk comp $FASTA_FILE | cut -f2 | awk '{sum+=$1}END{print sum/2}'))
+
+seqtk comp $FASTA_FILE | sort -rnk2 | cut -f2 | awk -v half_length=$half_length '{sum+=$1; if (sum>=half_length/2) {print $1" ("NR")" }}' | head -n 1
+
+##### DONE
