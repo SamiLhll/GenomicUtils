@@ -19,6 +19,26 @@ proteinID_specie_a  proteinID_specie_b
 
 -------------------------------------------------------
 
+# QuickPhylogeny
+
+This is a set of scripts to go from OrthoFinder's output to build a species tree using RAxML.
+It takes as input the OrthoFinder's output (version 2.5.2) and the minimum amount of species
+that has to be featured in the single copy orthogroups. The set of scripts requires that following tools intalled :
+* RAxML
+* Mafft
+* trimAL
+* GNU parallel
+* seqtk
+-------------------------------------------------------
+QuickPhylogeny : from orthofinder to a tree using mafft,trimAl and RAxML - usage :
+-t number of threads
+-s amount of species that have to feature an orthologue
+-i input == OrthoFinder output path
+-o outgroups for RAxML as a list separated by commas. enter none fo no outgroup
+-r run name
+
+-------------------------------------------------------
+
 # Sequence_utils :
 
 ### Calculate N50 :
