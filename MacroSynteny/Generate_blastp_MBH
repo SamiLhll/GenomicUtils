@@ -6,11 +6,11 @@
 #                      2020/12/03                           #
 #############################################################
 
-# This scrips takes two protein sets and blast it against each other to 
+# This scrips takes two protein sets and blast it against each other to
 # then extract the mutual best hits into a table
 
 ####### PARSE parameters
-while getopts a:b:n:t:h option
+while getopts a:b:o:t:h option
 do
 	case "${option}"
 	in
@@ -21,7 +21,7 @@ do
 	h) echo "generate blastp MBH (proteins only!) - usage :";
 	   echo "-a path to the first specie proteins dataset (FASTA)";
 	   echo "-b path to the second specie proteins dataset (FASTA)";
-	   echo "-o output name to give to the resulting table"
+	   echo "-o name to give to the resulting table"
 	   echo "-t number of threads to dedicate to the blast jobs";
 	   echo "-h prints this message and exit";
 	   exit;;
@@ -36,39 +36,39 @@ do
 done
 
 #########################
-# exit if a command fails 
+# exit if a command fails
 set -e
 ########
 
 ############### RUN :
 
 # create the blast databases :
-echo "--- create the blast databases ---"
+echo "create the blast databases"
 makeblastdb -in $SPECIE1 -input_type fasta -dbtype prot -title specie1 -out specie1_db
 makeblastdb -in $SPECIE2 -input_type fasta -dbtype prot -title specie2 -out specie2_db
 
 # Run the blast :
-echo "--- run the blastp jobs ---"
+echo "run the blast"
 blastp -query $SPECIE2 -db specie1_db -num_alignments 1 -num_descriptions 1 -out specie1_vs_specie2.out -num_threads $THREADS -outfmt 6
 blastp -query $SPECIE1 -db specie2_db -num_alignments 1 -num_descriptions 1 -out specie2_vs_specie1.out -num_threads $THREADS -outfmt 6
 
 # select only the significant hits, then select the highest bitscore for the query :
-echo "--- extract significant hits ---"
+echo "extract significant hits"
 
-awk '($11 < 1e-4) { print $1"\t"$2"\t"$12}' specie1_vs_specie2.out | \
+awk '($11 <= 1e-10) { print $1"\t"$2"\t"$12}' specie1_vs_specie2.out | \
 awk '$3>max[$1]{max[$1]=$3; row[$1]=$1"\t"$2} END {for (i in row) print row[i]}' > specie1_vs_specie2.significant.BH
 
-awk '($11 < 1e-4) { print $1"\t"$2"\t"$12}' specie2_vs_specie1.out | \
+awk '($11 <= 1e-10) { print $1"\t"$2"\t"$12}' specie2_vs_specie1.out | \
 awk '$3>max[$1]{max[$1]=$3; row[$1]=$1"\t"$2} END {for (i in row) print row[i]}' > specie2_vs_specie1.significant.BH
 
 # select the Mutual Best hits :
-echo "--- select the mutual best hits ---"
+echo "select the mutual best hits"
 
 comm -12 <(awk '{print $2"\t"$1}' specie1_vs_specie2.significant.BH | sort -k1) <(awk '{print $1"\t"$2}' specie2_vs_specie1.significant.BH | sort -k1) \
 > $OUTPUT_NAME
 
 # remove intermediate files :
-echo "--- clean ---"
+echo "clean"
 rm specie1_db* specie2_db* specie1_vs_specie2.* specie2_vs_specie1.*
 
 echo "DONE"
