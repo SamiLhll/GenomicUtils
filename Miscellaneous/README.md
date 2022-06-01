@@ -6,9 +6,13 @@ This script outputs the canva for a bashscript featuring the text entered as arg
 
 -------------------------------------------------------
 NewBashScript - usage :
+
 -a Author name
+
 -t Title of the script
+
 -o option names separated by "," as in "opt1,opt2,...,optn"
+
 -h prints this message and exit
 
 -------------------------------------------------------
