@@ -13,5 +13,6 @@ NewBashScript - usage :
 
 -------------------------------------------------------
 
-bash NewBashScriptCanva -a "Sami El Hilali" -t "Awesome bashscript" -o "Output,Bam,fasta,gtf" gives the following output
+**bash NewBashScriptCanva -a "Sami El Hilali" -t "Awesome bashscript" -o "Output,Bam,fasta,gtf"** gives the following output :
+
 ![image](https://user-images.githubusercontent.com/37333782/171440249-bff4ef67-1329-456b-a336-7e2dff09d471.png)
