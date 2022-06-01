@@ -13,6 +13,7 @@ NewBashScript - usage :
 -t Title of the script   
 -o option names separated by "," as in "opt1,opt2,...,optn"   
 -h prints this message and exit   
+
 -------------------------------------------------------
 
 **bash NewBashScriptCanva -a "Sami El Hilali" -t "Awesome bashscript" -o "Output,Bam,fasta,gtf"** gives the following output :
