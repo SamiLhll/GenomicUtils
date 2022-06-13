@@ -5,6 +5,9 @@ A collection of custom-made bash scripts to make my Genomics data analyses easil
 
 ### Generate_MBH_table :
 
+WARNING : It creates temporary files, so make sure that
+if you run two jobs in parallel, it's in separate folders.
+
 -------------------------------------------------------
 generate blastp MBH - usage :   
 -a path to the first specie proteins dataset (FASTA)   
