@@ -6,7 +6,7 @@ A collection of custom-made bash scripts to make my Genomics data analyses easil
 ### Generate_MBH_table :
 
 -------------------------------------------------------
-generate blastp MBH (proteins only!) - usage :   
+generate blastp MBH - usage :   
 -a path to the first specie proteins dataset (FASTA)   
 -b path to the second specie proteins dataset (FASTA)   
 -o name to give to the resulting table   
