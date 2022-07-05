@@ -67,7 +67,7 @@ done
 echo -e "\th) echo \"$Title - usage :\";"
 for element in "${array[@]}"
 do
-    echo -e "\t   echo\"-x $element\";"
+    echo -e "\t   echo \"-x $element\";"
 done
 echo -e "\t   exit;;"
 
@@ -75,7 +75,7 @@ echo -e "\t   exit;;"
 echo -e "\t?) echo \"$Title - usage :\";"
 for element in "${array[@]}"
 do
-    echo -e "\t   echo\"-x $element\";"
+    echo -e "\t   echo \"-x $element\";"
 done
 echo -e "\t   exit;;"
 
