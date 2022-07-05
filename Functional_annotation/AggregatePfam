@@ -1,0 +1,37 @@
+#######################################################
+# AggregatePfam
+# Sami El Hilali
+# 2022_juillet_05
+#######################################################
+
+# This script takes as input a pfam annotation result
+# (output of hmmsearch --domtable --noali options)
+# It outputs a tab with protein ids and aggregated pfam domains
+# formatted as following : protein_id    pfam_dom1(amount),pfam_dom2(amount),...
+
+
+####### PARSE parameters
+
+while getopts i:h option
+do
+	case "${option}"
+	in
+	i) input_path=${OPTARG};;
+	h) echo "AggregatePfam - usage :";
+	   echo"-i input_path";
+	   exit;;
+	?) echo "AggregatePfam - usage :";
+	   echo"-i input_path";
+	   exit;;
+	esac
+done
+#########################
+# exit if a command fails
+set -e
+########
+######################### RUN
+sed -e 's/ \+/\t/g' $input_path | \
+awk '$1 !~ /^#/ {count[$1"\t"$4]++} END { for (i in count) print i"("count[i]")"}' | \
+awk '{if (domains[$1] == "") {domains[$1]=$2} else {domains[$1]=domains[$1]","$2}} END {for (i in domains) print i"\t"domains[i]}' | \
+sort -rnk1
+######################### DONE
