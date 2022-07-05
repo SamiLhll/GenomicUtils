@@ -18,10 +18,10 @@ do
 	in
 	i) input_path=${OPTARG};;
 	h) echo "AggregatePfam - usage :";
-	   echo"-i input_path";
+	   echo "-i input_path";
 	   exit;;
 	?) echo "AggregatePfam - usage :";
-	   echo"-i input_path";
+	   echo "-i input_path";
 	   exit;;
 	esac
 done
