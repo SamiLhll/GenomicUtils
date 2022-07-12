@@ -15,9 +15,8 @@ AggregatePfam - usage :
 This scripts takes an assembly (mutifasta format) and do a tblastn of a set of mitochondrial
 genes agains it. It outputs the contigs with significant hits (evalu < 1.e-10)
 make sure to download the mitochondrial gene sequences from MITOs webserver :   
-[http://mitos.bioinf.uni-leipzig.de/mito/RefSeq39.zip](http://mitos.bioinf.uni-leipzig.de/mito/RefSeq39.zip)
- and replace in the script the value of the variable Mitochondrion_seq_path with the path where the sequences were downloaded.    
-
+[http://mitos.bioinf.uni-leipzig.de/mito/RefSeq39.zip](http://mitos.bioinf.uni-leipzig.de/mito/RefSeq39.zip).  
+Then replace in the script the value of the variable Mitochondrion_seq_path with the path where the sequences were downloaded.    
 
 Seek_mitochondrion - usage :   
 -n RUN_NAME   
