@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+#######################################################
+# Seek_mitochondrion
+# Sami El Hilali
+# 2022_juillet_07
+#######################################################
+
+# DESCRIPTION OF THE SCRIPT
+
+####### PARSE parameters
+
+while getopts n:a:t:h option
+do
+	case "${option}"
+	in
+	n) RUN_NAME=${OPTARG};;
+	a) ASSEMBLY=${OPTARG};;
+	t) THREADS=${OPTARG};;
+	h) echo "Seek_mitochondrion - usage :";
+	   echo "-n RUN_NAME";
+	   echo "-a ASSEMBLY";
+	   echo "-t THREADS";
+	   exit;;
+	?) echo "Seek_mitochondrion - usage :";
+	   echo "-n RUN_NAME";
+	   echo "-a ASSEMBLY";
+	   echo "-t THREADS";
+	   exit;;
+	esac
+done
+#########################
+# exit if a command fails
+set -e
+########
+
+### MORE OPTIONS :
+# PATH TO mito genes sequences :
+# download data from : http://mitos.bioinf.uni-leipzig.de/mito/RefSeq39.zip
+Mitochondrion_seq_path=./Refseq39
+
+######################### RUN
+
+# 1 - create the database :
+echo "Create database from sequences in : $ASSEMBLY ; name of db : $RUN_NAME"
+makeblastdb -in $ASSEMBLY -input_type fasta -dbtype nucl -title $RUN_NAME -out db_$RUN_NAME
+
+# 2 - Iterate on the mitochondrial gene sequences (pep) to query them on the assembly (tblastn) :
+
+declare -a MitoGenes=("atp6" "atp8" "atp9" "cob" "cox1" "cox2" "cox3" "nad1" "nad2" "nad3" "nad4" "nad4l" "nad5" "nad6")
+
+for feature in ${MitoGenes[@]};
+do
+  echo "tblastn -query $Mitochondrion_seq_path/$feature.fas -db db_$RUN_NAME -out $feature.vs.$ASSEMBLY.tab -num_threads $THREADS -outfmt 6" ;
+  tblastn -query $Mitochondrion_seq_path/$feature.fas -db db_$RUN_NAME -out $feature.vs.$ASSEMBLY.tab -num_threads $THREADS -outfmt 6 ;
+done
+
+# 3 - Post process blast output to see the contigs where there are significant hits (evalue < 1.e-10) :
+echo "############ ALL BLAST JOBS COMPLETED ##########"
+echo "Significant hits found in the assembly (evalue < 1.e-10) :"
+cat *.$ASSEMBLY.tab | awk '($11 < 1.e-10) {print}' | wc -l
+
+echo "Top 5 contigs with the highest amount of significant hits :"
+echo -e "contig\thits"
+cat *.$ASSEMBLY.tab | awk '($11 < 1.e-10) {count[$2]++} END { for (i in count) print i"\t"count[i]}' | sort -rnk2 | head -n 5
+
+
+######################### DONE
