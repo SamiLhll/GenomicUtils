@@ -2,8 +2,8 @@
 
 ### CalculateGCWindows :
 
-This script takes an assembly as input and calculates the GC content in windows of provided size.
-Output is formatted as bedgraph. It uses [seqtk](https://github.com/lh3/seqtk) and [bedtools](https://bedtools.readthedocs.io/en/latest/) (makewindows and nuc)
+This script takes an assembly as input and calculates the GC content in windows of provided size.   
+Output is formatted as bedgraph.   It uses [seqtk](https://github.com/lh3/seqtk) and [bedtools](https://bedtools.readthedocs.io/en/latest/) (makewindows and nuc)
 
 ---------------------------------------------   
 
@@ -17,16 +17,16 @@ CalculateGCWindows - usage :
 
 ### CalculateGeneDensityWindows :
 
-This script takes an assembly and gene annotations (GFF3) and calculates the Gene density in windows of provided size.
-Output is formatted as a bedgraph. It uses [seqtk](https://github.com/lh3/seqtk) and [bedtools](https://bedtools.readthedocs.io/en/latest/) (makewindows and intersect)
+This script takes an assembly and gene annotations (GFF3) and calculates the Gene density in windows of provided size.   
+Output is formatted as a bedgraph.   It uses [seqtk](https://github.com/lh3/seqtk) and [bedtools](https://bedtools.readthedocs.io/en/latest/) (makewindows and intersect)
 
 ---------------------------------------------   
 
-CalculateGeneDensityWindows - usage :
--a ASSEMBLY
--g GENES_GFF3
--s WINDOW_SIZE
--k KEEP_SEQUENCES   
+CalculateGeneDensityWindows - usage :   
+-a ASSEMBLY   
+-g GENES_GFF3   
+-s WINDOW_SIZE   
+-k KEEP_SEQUENCES     
 
 ---------------------------------------------
 
