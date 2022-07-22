@@ -36,9 +36,9 @@ Script that uses [seqtk](https://github.com/lh3/seqtk) comp function to calculat
 
 ---------------------------------------------
 
-calculate N50 - usage :
--i path to the genome assembly (FASTA)
--h prints this message and exit
+calculate N50 - usage :   
+-i path to the genome assembly (FASTA)   
+-h prints this message and exit   
 
 ---------------------------------------------
 
