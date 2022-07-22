@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+#######################################################
+# CalculateGeneDensityWindows
+# Sami El Hilali
+# 2022_juillet_22
+#######################################################
+
+# This script takes an assembly and gene annotations
+# (GFF3) and calculates the Gene density in windows
+# of provided size.
+# output is formatted as a bedgraph
+
+
+####### PARSE parameters
+
+while getopts a:g:s:k:h option
+do
+	case "${option}"
+	in
+	a) ASSEMBLY=${OPTARG};;
+	g) GENES_GFF3=${OPTARG};;
+	s) WINDOW_SIZE=${OPTARG};;
+	k) KEEP_SEQUENCES=${OPTARG};;
+	h) echo "CalculateGeneDensityWindows - usage :";
+	   echo "-a ASSEMBLY";
+	   echo "-g GENES_GFF3";
+	   echo "-s WINDOW_SIZE";
+	   echo "-k KEEP_SEQUENCES";
+	   exit;;
+	?) echo "CalculateGeneDensityWindows - usage :";
+	   echo "-a ASSEMBLY";
+	   echo "-g GENES_GFF3";
+	   echo "-w WINDOW_SIZE";
+	   echo "-k KEEP_SEQUENCES";
+	   exit;;
+	esac
+done
+
+#########################
+
+# exit if a command fails
+set -e
+########
+
+######################### RUN
+
+# get the chromosome sizes :
+seqtk comp $ASSEMBLY | cut -f1,2 | sort -rnk2 | head -n $KEEP_SEQUENCES > temp.CalculateGDWindows.chromosomes.txt
+
+# generate a bedfile with intervals :
+bedtools makewindows -g temp.CalculateGDWindows.chromosomes.txt -w $WINDOW_SIZE | bedtools sort -i - > temp.CalculateGDWindows.intervals.bed
+
+# convert genes gff3 to bed :
+grep -v "^#" $GENES_GFF3 | awk '($3 == "gene") {print $1"\t"$4"\t"$5}' | bedtools sort -i - > temp.CalculateGDWindows.genes.bed
+
+# Calculate gene density :
+bedtools intersect -a temp.CalculateGDWindows.intervals.bed -b temp.CalculateGDWindows.genes.bed -wao | \
+awk -v window_size=$WINDOW_SIZE '{count[$1"\t"$2"\t"$3]+=$7}END {for ( i in count) print i"\t"count[i] / window_size}' | \
+bedtools sort -i - | sed -e 's/,/./g' | awk '{print $1"\t"$2"\t"$3"\t"$4}'
+
+# remove temporary files :
+rm temp.CalculateGDWindows.*
+
+######################### DONE
