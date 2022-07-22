@@ -1,5 +1,19 @@
 # Sequence_utils :
 
+### CalculateGCWindows :
+
+This script takes an assembly as input and calculates the GC content in windows of provided size.
+Output is formatted as bedgraph. It uses seqtk and bedtools (makewindows and nuc)
+
+---------------------------------------------   
+
+CalculateGCWindows - usage :   
+-a ASSEMBLY   
+-s WINDOW_SIZE   
+-k KEEP_SEQUENCES   
+
+---------------------------------------------
+
 ### Calculate N50 :
 
 Script that uses seqtk comp function to calculate the N50 of an assembly or binned metagenome (fasta)
