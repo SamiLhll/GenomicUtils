@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+#######################################################
+# CalculateGCWindows
+# Sami El Hilali
+# 2022_juillet_22
+#######################################################
+
+# This script takes an assembly as input and calculates
+# the GC content in windows of provided size.
+# output is formatted as bedgraph
+# It uses seqtk and bedtools (makewindows and nuc)
+
+####### PARSE parameters
+
+while getopts a:s:k:h option
+do
+	case "${option}"
+	in
+	a) ASSEMBLY=${OPTARG};;
+	s) WINDOW_SIZE=${OPTARG};;
+	k) KEEP_SEQUENCES=${OPTARG};;
+	h) echo "CalculateGCWindows - usage :";
+	   echo "-a ASSEMBLY";
+	   echo "-s WINDOW_SIZE";
+	   echo "-k KEEP_SEQUENCES";
+	   exit;;
+	?) echo "CalculateGCWindows - usage :";
+	   echo "-a ASSEMBLY";
+	   echo "-s WINDOW_SIZE";
+	   echo "-k KEEP_SEQUENCES";
+	   exit;;
+	esac
+done
+
+#########################
+# exit if a command fails
+set -e
+########
+
+######################### RUN
+# get the chromosome sizes :
+seqtk comp $ASSEMBLY | cut -f1,2 | sort -rnk2 | head -n $KEEP_SEQUENCES > temp.CalculateGCWindows.chromosomes.txt
+
+# generate the bedgraph :
+bedtools makewindows -g temp.CalculateGCWindows.chromosomes.txt -w $WINDOW_SIZE | bedtools nuc -fi $ASSEMBLY -bed - | cut -f1-3,5 | tail -n +2
+
+# remove temporary files :
+rm temp.CalculateGCWindows.*
+
+######################### DONE
