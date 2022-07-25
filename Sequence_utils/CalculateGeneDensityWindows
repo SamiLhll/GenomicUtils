@@ -52,7 +52,7 @@ seqtk comp $ASSEMBLY | cut -f1,2 | sort -rnk2 | head -n $KEEP_SEQUENCES > temp.C
 bedtools makewindows -g temp.CalculateGDWindows.chromosomes.txt -w $WINDOW_SIZE | bedtools sort -i - > temp.CalculateGDWindows.intervals.bed
 
 # convert genes gff3 to bed :
-grep -v "^#" $GENES_GFF3 | awk '($3 == "gene") {print $1"\t"$4"\t"$5}' | bedtools sort -i - > temp.CalculateGDWindows.genes.bed
+grep -v "^#" $GENES_GFF3 | awk '($3 == "gene") {print $1"\t"$4"\t"$5}' | bedtools sort -i - | bedtools merge -i - > temp.CalculateGDWindows.genes.bed
 
 # Calculate gene density :
 bedtools intersect -a temp.CalculateGDWindows.intervals.bed -b temp.CalculateGDWindows.genes.bed -wao | \
