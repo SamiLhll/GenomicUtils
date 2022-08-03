@@ -97,6 +97,18 @@ QuickPhylogeny : from orthofinder to a tree using mafft,trimAl and RAxML - usage
 
 # Sequence_utils :
 
+### CalculateAAcomposition :
+
+This script calculates the amino acid composition of protein sequences provided as input in multi-fasta format
+
+---------------------------------------------    
+
+CalculateAAcomposition - usage :   
+-i INPUT_FILE
+
+---------------------------------------------    
+
+
 ### CalculateGCWindows :
 
 This script takes an assembly as input and calculates the GC content in windows of provided size.   
