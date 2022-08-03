@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+#######################################################
+# CalculateAAcomposition
+# Sami El Hilali
+# 2022_juillet_12
+#######################################################
+
+# This file calculates the amino acid composition of 
+# protein sequences provided as input in multi-fasta format
+
+####### PARSE parameters
+
+while getopts i:h option
+do
+	case "${option}"
+	in
+	i) INPUT_FILE=${OPTARG};;
+	h) echo "CalculateAAcomposition - usage :";
+	   echo "-i INPUT_FILE";
+	   exit;;
+	?) echo "CalculateAAcomposition - usage :";
+	   echo "-i INPUT_FILE";
+	   exit;;
+	esac
+done
+
+#########################
+# exit if a command fails
+set -e
+########
+
+######################### RUN
+
+declare -a AminoAcids=("A" "R" "N" "D" "C" "Q" "E" "G" "H" "I" "L" "K" "M" "F" "P" "S" "T" "W" "Y" "V")
+
+echo -e "protein_id\tseqsize\t${AminoAcids[*]}" | sed -e 's/ \+/\t/g'
+
+# get all protein IDs :
+fgrep ">" $INPUT_FILE | sed -e 's/>//g' | cut -f1 | cut -d " " -f1 > temp.protein_ids
+
+# for each protein, compute :
+# Size, and % of aa in AminoAcids
+
+while read protein_id;
+do
+  protein_seq=($(seqtk subseq $INPUT_FILE <(echo "$protein_id") | fgrep -v ">"));
+  protein_size=($(echo ${#protein_seq}));
+  protein_line=($(echo "$protein_id,$protein_size"))
+  # compute AA compositions :
+  for aa in ${AminoAcids[@]};
+  do
+
+    amino_value=($(echo "$protein_seq" | sed -e "s/[^$aa]//g" | awk -v tot="$protein_size" '{print int(((length/tot)*10000)+0.5)/100}'));
+    protein_line=($(echo "$protein_line,$amino_value"));
+  done
+echo "$protein_line" | sed -e 's/,/\t/g';
+done < temp.protein_ids
+
+# remove temporary files :
+rm temp.protein_ids
+
+######################### DONE
