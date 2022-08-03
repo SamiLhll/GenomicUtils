@@ -6,7 +6,7 @@
 # 2022_juillet_12
 #######################################################
 
-# This file calculates the amino acid composition of 
+# This script calculates the amino acid composition of 
 # protein sequences provided as input in multi-fasta format
 
 ####### PARSE parameters
