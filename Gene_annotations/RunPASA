@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+#######################################################
+# RunPASA
+# Sami El Hilali
+# 2022_août_12
+#######################################################
+
+# DESCRIPTION OF THE SCRIPT
+
+####### PARSE parameters
+
+while getopts g:t:f:n:h option
+do
+	case "${option}"
+	in
+	g) GENOME=${OPTARG};;
+	t) TRANSCRIPTS_FASTA=${OPTARG};;
+	f) TRANSCRIPTS_GTF=${OPTARG};;
+	n) RUN_NAME=${OPTARG};;
+	h) echo "RunPASA - usage :";
+	   echo "-g GENOME";
+	   echo "-t TRANSCRIPTS_FASTA";
+	   echo "-f TRANSCRIPTS_GTF";
+	   echo "-n RUN_NAME";
+	   exit;;
+	?) echo "RunPASA - usage :";
+	   echo "-g GENOME";
+	   echo "-t TRANSCRIPTS_FASTA";
+	   echo "-f TRANSCRIPTS_GTF";
+	   echo "-n RUN_NAME";
+	   exit;;
+	esac
+done
+#########################
+# exit if a command fails
+set -e
+########
+### More options :
+PASA_INSTALL_PATH="/usr/local/bin/PASApipeline.v2.4.1"
+WORKING_DIRECTORY=($(pwd))
+######################### RUN
+
+# create output drectory if it doesn't exist :
+if [ ! -d $RUN_NAME ]; then
+  mkdir -p $RUN_NAME;
+fi
+
+
+# copy the inputs in the run directory :
+cp $GENOME $RUN_NAME/genome.fa
+cp $TRANSCRIPTS_FASTA $RUN_NAME/transcripts.fa
+cp $TRANSCRIPTS_GTF $RUN_NAME/transcripts.gtf
+
+# 1 - CLEAN THE TRANSCRIPTS
+echo "1 - cleaning the transcripts"
+cd $RUN_NAME
+
+$PASA_INSTALL_PATH/bin/seqclean transcripts.fa
+
+# 2 - CONFIGURE
+echo "2 - configure"
+
+DATABASE_NAME_TO_REPLACE="$OUTPUT_FILE_PATH/$RUN_NAME/$RUN_NAME.sqlite"
+awk -v db_name=$DATABASE_NAME_TO_REPLACE '{if ($1 ~ /^DATABASE/) {print "DATABASE="db_name} else {print}}' $PASA_INSTALL_PATH/pasa_conf/pasa.alignAssembly.Template.txt \
+> alignAssembly.config
+
+# 3 - ALIGN TRANSCRIPTS
+
+echo "3 - align"
+
+$PASA_INSTALL_PATH/Launch_PASA_pipeline.pl -c alignAssembly.config \
+-C -R \
+--trans_gtf transcripts.gtf \
+-g genome.fa \
+-t transcripts.fa.clean \
+-T -u transcripts.fa \
+--ALIGNERS blat \
+--CPU 2
+
+# 4 - GENERATE TRAINING SET (AUGUSTUS)
+$PASA_INSTALL_PATH/scripts/pasa_asmbls_to_training_set.dbi --pasa_transcripts_fasta $RUN_NAME.sqlite.assemblies.fasta --pasa_transcripts_gff3 $RUN_NAME.sqlite.pasa_assemblies.gff3
+
+######################### DONE
