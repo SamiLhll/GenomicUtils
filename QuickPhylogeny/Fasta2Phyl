@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+#######################################################
+# Fasta2Phyl
+# Sami El Hilali
+# 2022_août_16
+#######################################################
+
+# This script converts an multi sequence alignment
+# from fasta to phylip using seqtk
+
+####### PARSE parameters
+
+while getopts i:o:h option
+do
+  case "${option}"
+  in
+  i) INPUT_FILE=${OPTARG};;
+  o) OUTPUT_FILE=${OPTARG};;
+  h) echo "Fasta2Phyl - usage :";
+     echo "-i INPUT_FILE";
+     echo "-o OUTPUT_FILE";
+     exit;;
+  ?) echo "Fasta2Phyl - usage :";
+     echo "-i INPUT_FILE";
+     echo "-o OUTPUT_FILE";
+     exit;;
+  esac
+done
+#########################
+# exit if a command fails
+set -e
+########
+######################### RUN
+
+#get n, the amount of sequences :
+N_seq=($(fgrep -c ">" $INPUT_FILE))
+
+#get m, the length of the sequences :
+M_align=($(seqtk comp $INPUT_FILE | head -n 1 | cut -f2))
+
+#get all the seq ids :
+fgrep ">" $INPUT_FILE | cut -d " " -f1 | sed -e 's/>//g' > temp.seqIds
+
+
+# Write phyl file :
+echo "$N_seq    $M_align" > $OUTPUT_FILE
+
+while read -r seqID;
+do
+  seqtk subseq head $INPUT_FILE <(echo "$seqID")| paste - - | awk '{print $1"    "$2}' >> $OUTPUT_FILE;
+done
+
+# remove temp files :
+rm temp.seqIds
+
+######################### DONE
