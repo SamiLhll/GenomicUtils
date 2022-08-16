@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+#######################################################
+# AnnotatePanther
+# Sami El Hilali
+# 2022_août_15
+#######################################################
+
+# This script searches for Panther families using hmmsearch
+# and generates a tabular output similar to the one created by
+# the script PantherScore.pl except that the hmmsearch job uses
+# multi-threading here.
+
+####### PARSE parameters
+
+while getopts p:n:t:h option
+do
+	case "${option}"
+	in
+	p) PROTEOME=${OPTARG};;
+        n) NAME=${OPTARG};;
+        t) THREADS=${OPTARG};;
+	h) echo "AnnotatePANTHER - usage :";
+	   echo "-p PROTEOME";
+           echo "-n NAME";
+           echo "-t THREADS";
+	   exit;;
+	?) echo "AnnotatePANTHER - usage :";
+	   echo "-p PROTEOME";
+           echo "-n NAME";
+           echo "-t THREADS";
+	   exit;;
+	esac
+done
+#########################
+# exit if a command fails
+set -e
+########
+######################### RUN
+
+### More options :
+PANTHER_DB_PATH=/scratch1/db/PANTHER16.0
+OUTPUT_PATH=./
+
+# run hmmsearch :
+hmmsearch --tblout $OUTPUT_PATH/$NAME.panther --noali --cpu $THREADS $PANTHER_DB_PATH/globals/binHmm.h3m $PROTEOME;
+# get family with best bitscore for each protein :
+grep -v "^#" $OUTPUT_PATH/$NAME.panther | sed -e 's/ \+/\t/g' | cut -f1,3,5,6 | sed -e 's/.orig.30/.mag/g' -e 's/.pir/.mod/g' \
+awk '($3 <=1.e-10) {print}' | awk '$4>max[$1]{max[$1]=$4; row[$1]=$0} END{for (i in row) print row[i]}' > $OUTPUT_PATH/$NAME.panther.best_hit
+# remove the larger output to save disk space :
+rm $OUTPUT_PATH/$NAME.panther
+# get panther family and subfamily names :
+cut -f2 $OUTPUT_PATH/$NAME.panther.best_hit > $OUTPUT_PATH/temp.panther_ids
+fgrep -f $OUTPUT_PATH/temp.panther_ids $PANTHER_DB_PATH/globals/names.tab | sed -e 's/ /_/g' > $OUTPUT_PATH/temp.panther_names
+join -1 2 -2 1 -o 1.1,1.2,2.2,1.3,1.4 <(sort -k2 $OUTPUT_PATH/$NAME.panther.best_hit) <(sort -k1 $OUTPUT_PATH/temp.panther_names) | \
+sed -e 's/ /\t/g' -e 's/.SF/:SF/g' -e 's/.mag//g' -e 's/.mod//g' > $OUTPUT_PATH/$NAME.panther_families
+# remove intermediate files :
+rm $OUTPUT_PATH/$NAME.panther.best_hit $OUTPUT_PATH/temp.panther_ids $OUTPUT_PATH/temp.panther_names
+
+######################### DONE
