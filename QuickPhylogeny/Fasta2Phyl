@@ -48,8 +48,8 @@ echo "$N_seq    $M_align" > $OUTPUT_FILE
 
 while read -r seqID;
 do
-  seqtk subseq head $INPUT_FILE <(echo "$seqID")| paste - - | awk '{print $1"    "$2}' >> $OUTPUT_FILE;
-done
+  seqtk subseq $INPUT_FILE <(echo "$seqID")| paste - - | awk '{print $1"    "$2}' >> $OUTPUT_FILE;
+done <temp.seqIds
 
 # remove temp files :
 rm temp.seqIds
