@@ -1,0 +1,59 @@
+#! /usr/bin/env bash
+#######################################################
+# AnnotatePfam
+# Sami El Hilali
+# 2022_août_17
+#######################################################
+
+# This script searches for Pfam domains using hmmsearch
+# and generates a table with aggregated domains per protein.
+# It outputs a tab with protein ids and aggregated pfam domains
+# formatted as following : protID	pfam_dom1(count),pfam_dom2(count),...
+
+####### PARSE parameters
+
+while getopts p:n:t:d:h option
+do
+	case "${option}"
+	in
+	p) PROTEOME=${OPTARG};;
+        n) NAME=${OPTARG};;
+        t) THREADS=${OPTARG};;
+	d) DATABASE=${OPTARG};;
+	h) echo "AnnotatePfam - usage :";
+	   echo "-p PROTEOME";
+           echo "-n NAME";
+           echo "-t THREADS";
+	   echo "-d DATABASE";
+	   exit;;
+	?) echo "AnnotatePfam - usage :";
+	   echo "-p PROTEOME";
+           echo "-n NAME";
+           echo "-t THREADS";
+	   echo "-d DATABASE";
+	   exit;;
+	esac
+done
+
+#########################
+# exit if a command fails
+set -e
+########
+######################### RUN
+
+### more options :
+OUTPUT_PATH=($(pwd))
+
+# run hmmsearch :
+hmmsearch --domtblout $OUTPUT_PATH/$NAME.pfam_dom_hits --noali --cut_ga --cpu $THREADS $DATABASE $PROTEOME
+
+# Aggregate Pfam :
+sed -e 's/ \+/\t/g' $OUTPUT_PATH/$NAME.pfam_dom_hits  | \
+awk '$1 !~ /^#/ {count[$1"\t"$4]++} END { for (i in count) print i"("count[i]")"}' | \
+awk '{if (domains[$1] == "") {domains[$1]=$2} else {domains[$1]=domains[$1]","$2}} END {for (i in domains) print i"\t"domains[i]}' | \
+sort -rnk1 > $OUTPUT_PATH/$NAME.pfam.tab
+
+# remove intermediate files :
+rm $OUTPUT_PATH/$NAME.pfam_dom_hits
+
+######################### DONE
