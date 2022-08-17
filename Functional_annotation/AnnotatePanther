@@ -13,22 +13,25 @@
 
 ####### PARSE parameters
 
-while getopts p:n:t:h option
+while getopts p:n:t:d:h option
 do
 	case "${option}"
 	in
 	p) PROTEOME=${OPTARG};;
         n) NAME=${OPTARG};;
         t) THREADS=${OPTARG};;
+	d) DATABASE=${OPTARG};;
 	h) echo "AnnotatePANTHER - usage :";
 	   echo "-p PROTEOME";
            echo "-n NAME";
            echo "-t THREADS";
+	   echo "-d DATABASE";
 	   exit;;
 	?) echo "AnnotatePANTHER - usage :";
 	   echo "-p PROTEOME";
            echo "-n NAME";
            echo "-t THREADS";
+	   echo "-d DATABASE";
 	   exit;;
 	esac
 done
@@ -39,13 +42,12 @@ set -e
 ######################### RUN
 
 ### More options :
-PANTHER_DB_PATH=/scratch1/db/PANTHER16.0
-OUTPUT_PATH=./
+OUTPUT_PATH=($(pwd))
 
 # run hmmsearch :
-hmmsearch --tblout $OUTPUT_PATH/$NAME.panther --noali --cpu $THREADS $PANTHER_DB_PATH/globals/binHmm.h3m $PROTEOME;
+hmmsearch --tblout $OUTPUT_PATH/$NAME.panther --noali --cpu $THREADS $DATABASE/globals/binHmm.h3m $PROTEOME;
 # get family with best bitscore for each protein :
-grep -v "^#" $OUTPUT_PATH/$NAME.panther | sed -e 's/ \+/\t/g' | cut -f1,3,5,6 | sed -e 's/.orig.30/.mag/g' -e 's/.pir/.mod/g' \
+grep -v "^#" $OUTPUT_PATH/$NAME.panther | sed -e 's/ \+/\t/g' | cut -f1,3,5,6 | sed -e 's/.orig.30/.mag/g' -e 's/.pir/.mod/g' | \
 awk '($3 <=1.e-10) {print}' | awk '$4>max[$1]{max[$1]=$4; row[$1]=$0} END{for (i in row) print row[i]}' > $OUTPUT_PATH/$NAME.panther.best_hit
 # remove the larger output to save disk space :
 rm $OUTPUT_PATH/$NAME.panther
