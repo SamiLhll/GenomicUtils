@@ -48,7 +48,7 @@ echo "$N_seq    $M_align" > $OUTPUT_FILE
 
 while read -r seqID;
 do
-  seqtk subseq $INPUT_FILE <(echo "$seqID")| paste - - | awk '{print $1"    "$2}' >> $OUTPUT_FILE;
+  seqtk subseq $INPUT_FILE <(echo "$seqID") | paste - - | sed -e 's/>//g' | awk '{print $1"    "$2}' >> $OUTPUT_FILE;
 done <temp.seqIds
 
 # remove temp files :
