@@ -1,5 +1,6 @@
-# GenomicsBashScripts
-A collection of custom-made bash scripts to make my Genomics data analyses easily reproducible 
+# GenomicsUtils
+
+A collection of custom-made scripts for genomics
 
 # Functional Annotation
 
@@ -75,7 +76,7 @@ NewBashScript - usage :
 ![image](https://user-images.githubusercontent.com/37333782/171440249-bff4ef67-1329-456b-a336-7e2dff09d471.png)
 
 
-# QuickPhylogeny
+# Phylogenomics
 
 This is a set of scripts to go from OrthoFinder's output to build a species tree using RAxML.
 It takes as input the OrthoFinder's output (version 2.5.2) and the minimum amount of species
