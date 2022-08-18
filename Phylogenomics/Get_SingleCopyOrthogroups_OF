@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+#############################################################
+#          getOrthoFinderSingleCopyOrthogroups              #
+#                    Sami El Hilali                         #
+#                      2021/06/21                           #
+#############################################################
+
+# This script creates a subset of an OrthoFinder GeneCounts table, selecting only
+# Single Copy Orthologues featuring the specified amount of species
+
+################ PARSE PARAMETERS :
+unset ORTHOFINDER_GENECOUNTS_TABLE
+unset AMOUNT_OF_SPECIES
+unset OUTPUT_TABLE
+
+usage()
+{
+ echo " --- subset of an OrthoFinder GeneCounts table, selecting only Single copy Orthologroups --- usage :"
+ echo "-i OrthoFinder GeneCounts table"
+ echo "-s Amount of Species an Orthogroup has to feature to be selected"
+ echo "-o Output file to write the subset table"
+ echo "-h prints this message and exit"
+}
+
+while getopts i:s:o:h option
+do
+	case "${option}" in
+	i) ORTHOFINDER_GENECOUNTS_TABLE=${OPTARG};;
+	s) AMOUNT_OF_SPECIES=${OPTARG};;
+	o) OUTPUT_TABLE=${OPTARG};;
+	h) usage
+	   exit;;
+	?) usage
+           exit;;
+	esac
+done
+
+if [ -z "$ORTHOFINDER_GENECOUNTS_TABLE" ]
+then
+ usage
+ exit
+fi
+
+if [ -z "$AMOUNT_OF_SPECIES" ]
+then
+ usage
+ exit
+fi
+
+if [ -z "$OUTPUT_TABLE" ]
+then
+ usage
+ exit
+fi
+
+#########################
+# exit if a command fails
+set -e
+########
+
+AMOUNT_OF_SPECIES_TOTAL=($(head -n 1 $ORTHOFINDER_GENECOUNTS_TABLE | awk '{print NF-2}'))
+echo "-- subsetting Single copy Orthogroups featuring $AMOUNT_OF_SPECIES species over a total of $AMOUNT_OF_SPECIES_TOTAL --"
+
+############### RUN :
+# write header  to the output table :
+> $OUTPUT_TABLE
+# Select the Single copy Orthogroups :
+awk -v tot=$AMOUNT_OF_SPECIES_TOTAL '{c=0; for(i=2;i<=(NF-1);i++) c+=($i==1 || $i == 0)} c/tot==1' $ORTHOFINDER_GENECOUNTS_TABLE \
+| awk -v tot=$AMOUNT_OF_SPECIES '($NF>=tot) {print $1}' >> $OUTPUT_TABLE
+echo "-- done --"
