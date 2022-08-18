@@ -46,7 +46,6 @@ if [ ! -d $RUN_NAME ]; then
   mkdir -p $RUN_NAME;
 fi
 
-
 # copy the inputs in the run directory :
 cp $GENOME $RUN_NAME/genome.fa
 cp $TRANSCRIPTS_FASTA $RUN_NAME/transcripts.fa
@@ -54,14 +53,15 @@ cp $TRANSCRIPTS_GTF $RUN_NAME/transcripts.gtf
 
 # 1 - CLEAN THE TRANSCRIPTS
 echo "1 - cleaning the transcripts"
-cd $RUN_NAME
 
+cd $RUN_NAME
 $PASA_INSTALL_PATH/bin/seqclean transcripts.fa
 
 # 2 - CONFIGURE
 echo "2 - configure"
-WORKING_DIRECTORY=($(pwd))
-DATABASE_NAME_TO_REPLACE="$WORKING_DIRECTORY/$RUN_NAME.sqlite"
+
+RUN_DIRECTORY=($(pwd))
+DATABASE_NAME_TO_REPLACE="$RUN_DIRECTORY/$RUN_NAME.sqlite"
 awk -v db_name=$DATABASE_NAME_TO_REPLACE '{if ($1 ~ /^DATABASE/) {print "DATABASE="db_name} else {print}}' $PASA_INSTALL_PATH/pasa_conf/pasa.alignAssembly.Template.txt \
 > alignAssembly.config
 
