@@ -1,4 +1,4 @@
-# GenomicsUtils
+# GenomicUtils
 
 A collection of custom-made scripts for genomics
 
