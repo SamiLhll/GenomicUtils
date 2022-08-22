@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+#######################################################
+# Proteins2Genome
+# Sami El Hilali
+# 2022_août_22
+#######################################################
+
+# This script do a spliced alignment of proteins against
+# a genome using exonerate. The number of chunks will define 
+# the amount of threads used for the run.
+
+####### PARSE parameters
+
+while getopts q:t:c:o:h option
+do
+	case "${option}"
+	in
+	q) QUERY=${OPTARG};;
+	t) TARGET=${OPTARG};;
+	c) CHUNKS=${OPTARG};;
+	o) OUTPUT_NAME=${OPTARG};;
+	h) echo "Proteins2Genome - usage :";
+	   echo "-q QUERY";
+	   echo "-t TARGET";
+	   echo "-c CHUNKS (also equal to threads to use)";
+	   echo "-o OUTPUT_NAME";
+	   exit;;
+	?) echo "Proteins2Genome - usage :";
+	   echo "-q QUERY";
+	   echo "-t TARGET";
+	   echo "-c CHUNKS (also equal to threads to use";
+	   echo "-o OUTPUT_NAME";
+	   exit;;
+	esac
+done
+#########################
+# exit if a command fails
+set -e
+########
+######################### RUN
+
+for i in  {1..$THREADS}
+do
+
+  echo "CMD : Exonerate $i"
+
+  exonerate --model protein2genome \
+  --query $QUERY \
+  --target $TARGET \
+  --showvulgar no \
+  --showalignment no \
+  --showquerygff no \
+  --showtargetgff yes \
+  --percent 80 \
+  --querychunkid $i \
+  --softmasktarget yes \
+  --ryo "AveragePercentIdentity: %pi\n" \
+  --querychunktotal $THREADS > $OUTPUT_NAME.$i.exonerate &
+
+done
+
+wait
+######################### DONE
