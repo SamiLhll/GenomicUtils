@@ -6,7 +6,9 @@
 # 2022_août_12
 #######################################################
 
-# DESCRIPTION OF THE SCRIPT
+# This script groups the inputs, write configuration file
+# and run a gene annotation from Transcriptome de novo assembly
+# using PASA and transdecoder.
 
 ####### PARSE parameters
 
